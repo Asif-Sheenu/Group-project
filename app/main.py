@@ -1,15 +1,8 @@
 from fastapi import FastAPI
-from app.core.database import engine, Base
-
-# import models so SQLAlchemy knows them
-from app.models import user  
 from app.routes import auth
-
+from app.core.database import supabase
 
 app = FastAPI()
-
-# create tables
-Base.metadata.create_all(bind=engine)
 
 app.include_router(auth.router)
 
@@ -17,4 +10,7 @@ app.include_router(auth.router)
 def home():
     return {"message": "PetCare backend running"}
 
-
+@app.get("/test")
+def test():
+    data = supabase.table("users").select("*").execute()
+    return data.data
