@@ -1,9 +1,10 @@
-from sqlalchemy import create_engine
-from sqlalchemy.orm import sessionmaker, declarative_base
+from supabase import create_client
+import os
+from dotenv import load_dotenv
 
-DATABASE_URL = "postgresql://postgres:r%40123@localhost:5432/petcare"
+load_dotenv()
 
-engine = create_engine(DATABASE_URL)
-SessionLocal = sessionmaker(bind=engine)
+SUPABASE_URL = os.getenv("SUPABASE_URL")
+SUPABASE_KEY = os.getenv("SUPABASE_KEY")
 
-Base = declarative_base()
+supabase = create_client(SUPABASE_URL, SUPABASE_KEY)
