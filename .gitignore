@@ -35,3 +35,8 @@ build/
 
 # Docker overrides
 docker-compose.override.yml
+
+venv/
+.env
+__pycache__/
+*.pyc
