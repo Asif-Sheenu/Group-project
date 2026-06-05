@@ -1,18 +1,29 @@
 from sqlalchemy.orm import Session
 from sqlalchemy.exc import SQLAlchemyError
 from fastapi import HTTPException
-
+from app.services.imagehash_checker import is_duplicate_image
 from app.models.claim import Claim
 
 
-def create_claim_service(db: Session, claim):
+def create_claim_service(db: Session,claim,image_url,
+    image_hash):
 
     try:
+        existing_claims= db.query(Claim).all()
+        for old_claim in existing_claims:
+            if old_claim.image_hash:
+                if is_duplicate_image(image_hash,old_claim.image_hash):
+                    raise HTTPException(status_code=400,detail="Duplicate image detected")
+
+
 
         new_claim = Claim(
             pet_id=claim.pet_id,
             amount=claim.amount,
             description=claim.description,
+            image_url=image_url,
+            image_hash=image_hash,
+
             status="PENDING"
         )
 

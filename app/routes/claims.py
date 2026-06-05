@@ -1,8 +1,8 @@
 from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
-from fastapi import UploadFile,File
+from fastapi import UploadFile,File,Form
 from app.services.s3_service import upload_file_to_s3
-
+from app.services.imagehash_checker import  generate_image_hash, is_duplicate_image
 
 from app.schemas.claim import (
     ClaimCreate,
@@ -23,13 +23,48 @@ from app.core.database import get_db
 router = APIRouter()
 
 
-@router.post("/claims", response_model=ClaimResponse)
-def create_claim(
-    claim: ClaimCreate,
-    db: Session = Depends(get_db)
-):
+# @router.post("/claims", response_model=ClaimResponse)
+# def create_claim(
+#     claim: ClaimCreate,
+#     db: Session = Depends(get_db)
+# ):
 
-    return create_claim_service(db, claim)
+#     return create_claim_service(db, claim)
+
+@router.post("/claims",response_model=ClaimResponse)
+async def create_claim(pet_id:int=Form(...),amount:int=Form(...),
+                       description:str=Form(...),file:UploadFile=File(...)
+                       ,db:Session=Depends(get_db)):
+    
+    content= await file.read()
+
+    # save tmp for hashing 
+
+    temp_path=f"temp_{file.filename}"
+
+    with open(temp_path,"wb")as temp_file:
+        temp_file.write(content)
+
+    file.file.seek(0)    
+# upload img to  s3 
+
+    image_url=upload_file_to_s3(file.file,file.filename)
+    # generate  img hashh 
+
+    image_hash=generate_image_hash(temp_path)
+
+
+    # create schmas obj 
+
+    claim_data=ClaimCreate(pet_id=pet_id,amount=amount,description=description)
+
+
+    # save 
+
+    return create_claim_service(db,claim_data,image_url,image_hash)
+
+
+
 
 
 @router.get("/all_claims", response_model=list[ClaimResponse])
