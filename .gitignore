@@ -1,6 +1,40 @@
+# Virtual Environment
+venv/
 
+# Environment variables
 .env
+
+# Python cache
 __pycache__/
 *.pyc
-venv/
+
+# IDE files
+.vscode/
+.idea/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+
+# Pytest cache
+.pytest_cache/
+
+# Coverage reports
+htmlcov/
+.coverage
+
+# Database files
+*.sqlite3
+
+# Build files
+dist/
+build/
+
+# Docker overrides
+docker-compose.override.yml
+
+# Temporary images
 temp_*.png
