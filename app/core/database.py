@@ -38,9 +38,9 @@ def get_db():
 SUPABASE_URL = os.getenv("SUPABASE_URL")
 
 SUPABASE_KEY = os.getenv("SUPABASE_KEY")
-print(DATABASE_URL)
-print(SUPABASE_URL)
-print(SUPABASE_KEY)
+# print(DATABASE_URL)
+# print(SUPABASE_URL)
+# print(SUPABASE_KEY)
 print("STEP 5")
 supabase = create_client(
     SUPABASE_URL,

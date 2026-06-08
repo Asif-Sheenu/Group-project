@@ -2,10 +2,13 @@ from fastapi import FastAPI
 from app.routes import auth
 from app.core.database import supabase
 from app.routes import claims
+from app.routes import google_auth
 
 app = FastAPI()
 
 app.include_router(auth.router)
+app.include_router(google_auth.router)
+
 
 @app.get("/")
 def home():

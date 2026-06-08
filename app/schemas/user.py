@@ -18,3 +18,9 @@ class ResendOTP(BaseModel):
 class LoginSchema(BaseModel):
     email: EmailStr
     password: str
+
+class GoogleLoginSchema(BaseModel):
+    token: str
+
+class RefreshTokenSchema(BaseModel):
+    refresh_token: str
