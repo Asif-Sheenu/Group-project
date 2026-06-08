@@ -8,13 +8,23 @@ from app.services.redis_service import redis_client
 from app.services.email_service import send_otp_email
 
 from app.schemas.user import VerifyOTP
-from app.core.jwt_handler import create_access_token
 
 from app.schemas.user import ResendOTP
 
 from app.schemas.user import LoginSchema
 from app.core.security import verify_password
-from app.core.jwt_handler import create_access_token
+
+from app.core.jwt_handler import (
+    create_access_token,
+    create_refresh_token
+)
+
+from jose import jwt, JWTError
+from app.core.jwt_handler import SECRET_KEY, ALGORITHM
+
+from app.schemas.user import GoogleLoginSchema
+from app.schemas.user import RefreshTokenSchema
+from app.services.google_service import verify_google_token
 
 import json
 
@@ -110,16 +120,18 @@ def verify_otp(data: VerifyOTP):
     # delete otp from redis
     redis_client.delete(f"otp:{data.email}")
 
-    # generate jwt token
-    token = create_access_token({
-        "email": user_data["email"]
-    })
+    # # generate jwt token
+    # token = create_access_token({
+    #     "email": user_data["email"]
+    # })
 
-    return {
-        "message": "Registration successful",
-        "access_token": token,
-        "user": response.data
-    }
+    # return {
+    #     "message": "Registration successful",
+    #     "access_token": token,
+    #     "user": response.data
+    # }
+
+    
 
 @router.post("/resend-otp")
 async def resend_otp(data: ResendOTP):
@@ -153,6 +165,47 @@ async def resend_otp(data: ResendOTP):
         "message": "New OTP sent successfully"
     }
 
+# @router.post("/login")
+# def login(user: LoginSchema):
+
+#     existing_user = supabase.table("users") \
+#         .select("*") \
+#         .eq("email", user.email) \
+#         .execute()
+
+#     if not existing_user.data:
+#         raise HTTPException(
+#             status_code=400,
+#             detail="Invalid email or password"
+#         )
+
+#     db_user = existing_user.data[0]
+
+#     if not verify_password(
+#         user.password,
+#         db_user["password"]
+#     ):
+#         raise HTTPException(
+#             status_code=400,
+#             detail="Invalid email or password"
+#         )
+
+#     token = create_access_token({
+#         "email": db_user["email"],
+#         "role": db_user["role"]
+#     })
+
+#     return {
+#         "message": "Login successful",
+#         "access_token": token,
+#         "user": {
+#             "id": db_user.get("id"),
+#             "name": db_user["name"],
+#             "email": db_user["email"],
+#             "role": db_user["role"]
+#         }
+#     }
+
 @router.post("/login")
 def login(user: LoginSchema):
 
@@ -178,14 +231,19 @@ def login(user: LoginSchema):
             detail="Invalid email or password"
         )
 
-    token = create_access_token({
+    access_token = create_access_token({
         "email": db_user["email"],
         "role": db_user["role"]
     })
 
+    refresh_token = create_refresh_token({
+        "email": db_user["email"]
+    })
+
     return {
         "message": "Login successful",
-        "access_token": token,
+        "access_token": access_token,
+        "refresh_token": refresh_token,
         "user": {
             "id": db_user.get("id"),
             "name": db_user["name"],
@@ -193,3 +251,118 @@ def login(user: LoginSchema):
             "role": db_user["role"]
         }
     }
+
+
+# @router.post("/google-login")
+# def google_login(data: GoogleLoginSchema):
+
+#     google_user = verify_google_token(data.token)
+
+#     email = google_user["email"]
+#     name = google_user.get("name")
+
+#     existing_user = supabase.table("users") \
+#         .select("*") \
+#         .eq("email", email) \
+#         .execute()
+
+#     if existing_user.data:
+
+#         db_user = existing_user.data[0]
+
+#     else:
+
+#         response = supabase.table("users").insert({
+#             "name": name,
+#             "email": email,
+#             "password": None,
+#             "role": "user"
+#         }).execute()
+
+#         db_user = response.data[0]
+
+#     token = create_access_token({
+#         "email": db_user["email"],
+#         "role": db_user["role"]
+#     })
+
+#     return {
+#         "message": "Google login successful",
+#         "access_token": token,
+#         "user": db_user
+#     }
+
+
+@router.post("/google-login")
+def google_login(data: GoogleLoginSchema):
+
+    google_user = verify_google_token(data.token)
+
+    email = google_user["email"]
+    name = google_user.get("name")
+
+    existing_user = supabase.table("users") \
+        .select("*") \
+        .eq("email", email) \
+        .execute()
+
+    if existing_user.data:
+        db_user = existing_user.data[0]
+
+    else:
+        response = supabase.table("users").insert({
+            "name": name,
+            "email": email,
+            "password": None,
+            "role": "user"
+        }).execute()
+
+        db_user = response.data[0]
+
+    access_token = create_access_token({
+        "email": db_user["email"],
+        "role": db_user["role"]
+    })
+
+    refresh_token = create_refresh_token({
+        "email": db_user["email"]
+    })
+
+    return {
+        "message": "Google login successful",
+        "access_token": access_token,
+        "refresh_token": refresh_token,
+        "user": db_user
+    }
+
+@router.post("/refresh-token")
+def refresh_token(data: RefreshTokenSchema):
+
+    try:
+
+        payload = jwt.decode(
+            data.refresh_token,
+            SECRET_KEY,
+            algorithms=[ALGORITHM]
+        )
+
+        if payload.get("type") != "refresh":
+            raise HTTPException(
+                status_code=401,
+                detail="Invalid token type"
+            )
+
+        new_access_token = create_access_token({
+            "email": payload["email"]
+        })
+
+        return {
+            "access_token": new_access_token
+        }
+
+    except JWTError:
+
+        raise HTTPException(
+            status_code=401,
+            detail="Invalid refresh token"
+        )
