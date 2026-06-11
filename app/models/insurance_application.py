@@ -4,17 +4,17 @@ from datetime import datetime
 from app.core.database import Base
 
 
-class Pet(Base):
+class InsuranceApplication(Base):
 
-    __tablename__ = "pets"
+    __tablename__ = "insurance_applications"
 
     id = Column(Integer, primary_key=True, index=True)
 
     user_id = Column(Integer)
 
-    name = Column(String, nullable=False)
+    plan_name = Column(String)
 
-    species = Column(String, nullable=False)
+    dog_name = Column(String)
 
     breed = Column(String)
 
@@ -27,5 +27,14 @@ class Pet(Base):
     vaccination_status = Column(String)
 
     existing_disease = Column(String)
+
+    front_image = Column(String)
+    side_image = Column(String)
+    full_body_image = Column(String)
+
+    vaccination_proof = Column(String)
+    medical_record = Column(String)
+
+    status = Column(String, default="pending")
 
     created_at = Column(DateTime, default=datetime.utcnow)
