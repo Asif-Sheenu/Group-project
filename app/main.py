@@ -35,7 +35,10 @@ from app.models.cat_insurance_application import (
 )
 
 from app.routes.pet import router as pet_router
+from app.routes.hospital import router as hospital_router
+
 from app.models.pet import Pet
+from app.models.hospital import Hospital
 
 app = FastAPI(
     title="PetCare Insurance API"
@@ -49,6 +52,7 @@ app.include_router(auth.router)
 app.include_router(google_auth.router)
 
 app.include_router(pet_router)
+app.include_router(hospital_router)
 
 # Claims
 app.include_router(claims.router)
