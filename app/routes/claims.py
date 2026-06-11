@@ -3,6 +3,7 @@ from sqlalchemy.orm import Session
 from fastapi import UploadFile,File,Form
 from app.services.s3_service import upload_file_to_s3
 from app.services.imagehash_checker import  generate_image_hash, is_duplicate_image
+from app.services.clip_service import generate_clip_embedding
 
 from app.schemas.claim import (
     ClaimCreate,
@@ -53,6 +54,8 @@ async def create_claim(pet_id:int=Form(...),amount:int=Form(...),
 
     image_hash=generate_image_hash(temp_path)
 
+# embedding
+    clip_embedding= generate_clip_embedding(temp_path)
 
     # create schmas obj 
 
@@ -61,7 +64,7 @@ async def create_claim(pet_id:int=Form(...),amount:int=Form(...),
 
     # save 
 
-    return create_claim_service(db,claim_data,image_url,image_hash)
+    return create_claim_service(db,claim_data,image_url,image_hash,clip_embedding)
 
 
 
