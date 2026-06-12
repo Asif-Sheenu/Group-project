@@ -23,3 +23,8 @@ class HospitalResponse(BaseModel):
 
     class Config:
         from_attributes = True    
+
+
+class HospitalLogin(BaseModel):
+    registration_number: str
+    password: str
