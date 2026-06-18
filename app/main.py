@@ -7,6 +7,9 @@ from app.routes import auth
 from app.routes import claims
 from app.routes import google_auth
 
+# Payment
+from app.routes.payment import router as payment_router
+
 # Dog Routes
 from app.routes.pets_plans import (
     router as dog_plan_router
@@ -34,6 +37,9 @@ from app.models.cat_insurance_application import (
     CatInsuranceApplication
 )
 
+from app.models.payment import Payment
+
+
 app = FastAPI(
     title="PetCare Insurance API"
 )
@@ -41,12 +47,19 @@ app = FastAPI(
 # Create Database Tables
 Base.metadata.create_all(bind=engine)
 
+# ==========================
+# Register Routes
+# ==========================
+
 # Auth
 app.include_router(auth.router)
 app.include_router(google_auth.router)
 
 # Claims
 app.include_router(claims.router)
+
+# Payment
+app.include_router(payment_router)
 
 # Dog
 app.include_router(dog_plan_router)
