@@ -1,7 +1,7 @@
 from fastapi import UploadFile,APIRouter,File
 from app.services.rag_service import store_policy_document,search_policy_documents
 from pydantic import BaseModel
-
+from app.services.llm_service import generate_answer
 
 router =APIRouter(tags=["RAG"])
 
@@ -27,6 +27,17 @@ class QestionRequest(BaseModel):
 def ask_policy(data:QestionRequest):
 
     results=search_policy_documents(data.question)
+    print("RESULTS:", results)
 
-    return results
+    context = "\n".join(
+    results["documents"][0]
+    )
+    answer = generate_answer(
+        data.question,
+        context
+    )
+    return {
+        "question": data.question,
+       "answer": answer
+    }
         

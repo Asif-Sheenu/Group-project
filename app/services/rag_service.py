@@ -79,7 +79,7 @@ def store_policy_document(
 
 
 def search_policy_documents (question):
-
+    print("COLLECTION COUNT:", collection.count())
     embedding =generate_text_embedding(question)
 
     results = collection.query(
