@@ -1,6 +1,7 @@
+print ("step 0")
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker, declarative_base
-
+print ("begin")
 from supabase import create_client
 from dotenv import load_dotenv
 import os
@@ -11,9 +12,7 @@ load_dotenv()
 
 print("STEP 2")
 
-# ==========================
 # SQLAlchemy Configuration
-# ==========================
 
 DATABASE_URL = os.getenv("DATABASE_URL")
 
