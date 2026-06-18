@@ -21,7 +21,9 @@ jobs:
           script: |
             cd ~/Group-project
 
-            git pull origin main
+            git fetch origin
+            git reset --hard origin/main
+
 
             docker stop pet-api || true
             docker rm pet-api || true
@@ -30,5 +32,6 @@ jobs:
 
             docker run -d \
               --name pet-api \
+              --env-file .env \
               -p 8000:8000 \
               pet-insurance

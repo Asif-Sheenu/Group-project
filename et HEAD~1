@@ -1,0 +1,13 @@
+[33mcommit a16acd8889ffdd91e08597630aee1bcea518ccb2[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32masif-dev[m[33m)[m
+Author: Asif <asifssheenu@gmail.com>
+Date:   Thu Jun 11 11:08:27 2026 +0530
+
+    chromadb updated
+
+.env
+app/routes/claims.py
+app/services/chroma_service.py
+app/services/claim_service.py
+app/services/clip_service.py
+app/services/fraud_engine.py
+requirements.txt

@@ -1,8 +1,11 @@
 from fastapi import FastAPI
+print("MAIN STEP 1")
 
 from app.core.database import Base, engine, supabase
-
+print("MAIN STEP 2")
 # Auth
+print("MAIN STEP 3")
+
 from app.routes import auth
 from app.routes import claims
 from app.routes import google_auth
@@ -39,6 +42,11 @@ from app.routes.hospital import router as hospital_router
 
 from app.models.pet import Pet
 from app.models.hospital import Hospital
+# rag 
+print("MAIN STEP 4")
+
+from app.routes import rag
+print("MAIN STEP 5")
 
 app = FastAPI(
     title="PetCare Insurance API"
@@ -65,6 +73,10 @@ app.include_router(dog_insurance_router)
 app.include_router(cat_plan_router)
 app.include_router(cat_insurance_router)
 
+
+# rag policy register 
+
+app.include_router(rag.router)
 
 @app.get("/")
 def home():
