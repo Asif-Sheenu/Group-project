@@ -1,12 +1,12 @@
 # Virtual Environment
 venv/
 
+# Environment variables
+.env
+
 # Python cache
 __pycache__/
 *.pyc
-
-# Environment variables
-.env
 
 # IDE files
 .vscode/
@@ -36,7 +36,5 @@ build/
 # Docker overrides
 docker-compose.override.yml
 
-venv/
-.env
-__pycache__/
-*.pyc
+# Temporary images
+temp_*.png
