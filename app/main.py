@@ -10,6 +10,9 @@ from app.routes import google_auth
 # Payment
 from app.routes.payment import router as payment_router
 
+# Upload
+from app.routes.upload import router as upload_router
+
 # Pet & Hospital
 from app.routes.pet import router as pet_router
 from app.routes.hospital import router as hospital_router
@@ -74,6 +77,9 @@ app.include_router(claims.router)
 
 # Payment
 app.include_router(payment_router)
+
+# Upload
+app.include_router(upload_router)
 
 # Dog Insurance
 app.include_router(dog_plan_router)
