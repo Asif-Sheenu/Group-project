@@ -1,10 +1,7 @@
 from fastapi import FastAPI
-print("MAIN STEP 1")
 
 from app.core.database import Base, engine, supabase
-print("MAIN STEP 2")
 # Auth
-print("MAIN STEP 3")
 
 from app.routes import auth
 from app.routes import claims
@@ -43,10 +40,10 @@ from app.routes.hospital import router as hospital_router
 from app.models.pet import Pet
 from app.models.hospital import Hospital
 # rag 
-print("MAIN STEP 4")
 
 from app.routes import rag
-print("MAIN STEP 5")
+from app.routes import ai_claim_review
+
 
 app = FastAPI(
     title="PetCare Insurance API"
@@ -77,6 +74,13 @@ app.include_router(cat_insurance_router)
 # rag policy register 
 
 app.include_router(rag.router)
+
+#  ai claim service for admin (gives deatils of claim with reject/ aprroved with reason using rag)
+
+app.include_router(ai_claim_review.router)
+
+
+
 
 @app.get("/")
 def home():
