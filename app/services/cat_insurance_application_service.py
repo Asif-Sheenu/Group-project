@@ -45,3 +45,25 @@ def create_application(db, application_data):
     db.refresh(application)
 
     return application
+
+
+def get_all_applications(db):
+
+    return db.query(
+        CatInsuranceApplication
+    ).all()
+
+
+def get_application_by_id(
+    db,
+    application_id
+):
+
+    return (
+        db.query(CatInsuranceApplication)
+        .filter(
+            CatInsuranceApplication.id ==
+            application_id
+        )
+        .first()
+    )

@@ -1,9 +1,9 @@
 from pydantic import BaseModel
 
-
 class CreateOrderRequest(BaseModel):
     user_id: int
     application_id: int
+    application_type: str  # dog or cat
     amount: float
 
 
