@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, Float, String, DateTime
+from sqlalchemy import Column, Integer, Float, String, DateTime , Text
 from sqlalchemy.sql import func
 from app.core.database import Base
 
@@ -16,6 +16,16 @@ class Claim(Base):
     description = Column(String, nullable=False)
 
     status = Column(String, default="PENDING")
+
+    ai_recommendation = Column(
+    String,
+    nullable=True
+    )
+
+    ai_reason = Column(
+        Text,
+    nullable=True
+    )
 
     image_url = Column(String, nullable=True)
 
