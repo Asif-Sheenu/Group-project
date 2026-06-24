@@ -1,8 +1,8 @@
 from fastapi import FastAPI
 
 from app.core.database import Base, engine, supabase
-
 # Auth
+
 from app.routes import auth
 from app.routes import claims
 from app.routes import google_auth
@@ -51,6 +51,12 @@ from app.models.payment import Payment
 
 from app.models.pet import Pet
 from app.models.hospital import Hospital
+# rag 
+print("MAIN STEP 4")
+
+from app.routes import rag
+from app.routes import ai_claim_review
+
 
 
 app = FastAPI(
@@ -91,6 +97,12 @@ app.include_router(cat_insurance_router)
 
 # RAG
 app.include_router(rag.router)
+
+#  ai claim service for admin (gives deatils of claim with reject/ aprroved with reason using rag)
+
+app.include_router(ai_claim_review.router)
+
+
 
 
 @app.get("/")

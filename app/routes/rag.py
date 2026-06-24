@@ -41,3 +41,4 @@ def ask_policy(data:QestionRequest):
        "answer": answer
     }
         
+
