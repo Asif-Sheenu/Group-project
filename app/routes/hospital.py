@@ -25,6 +25,21 @@ from app.services.hospital_verification import (
     verify_url
 )
 
+from app.schemas.hospital import (
+    HospitalCreate,
+    HospitalResponse,
+    HospitalLogin
+)
+
+from app.core.security import (
+    hash_password,
+    verify_password
+)
+
+from app.core.jwt_handler import (
+    create_access_token
+)
+
 router = APIRouter(
     prefix="/hospitals",
     tags=["Hospitals"]
@@ -46,7 +61,7 @@ async def register_hospital(
         status_code=400,
         detail="Passwords do not match"
     )
-    
+
     # Website OR Google Maps required
     if (
         not hospital.website_url
@@ -112,3 +127,42 @@ async def register_hospital(
     )
 
     return new_hospital
+
+@router.post("/login")
+async def hospital_login(
+    hospital: HospitalLogin,
+    db: Session = Depends(get_db)
+):
+
+    existing_hospital = db.query(Hospital).filter(
+        Hospital.registration_number
+        == hospital.registration_number
+    ).first()
+
+    if not existing_hospital:
+        raise HTTPException(
+            status_code=401,
+            detail="Invalid credentials"
+        )
+
+    if not verify_password(
+        hospital.password,
+        existing_hospital.password_hash
+    ):
+        raise HTTPException(
+            status_code=401,
+            detail="Invalid credentials"
+        )
+
+    access_token = create_access_token(
+        data={
+            "hospital_id": existing_hospital.id,
+            "registration_number":
+            existing_hospital.registration_number
+        }
+    )
+
+    return {
+        "access_token": access_token,
+        "token_type": "bearer"
+    }

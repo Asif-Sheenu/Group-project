@@ -7,6 +7,19 @@ from app.routes import auth
 from app.routes import claims
 from app.routes import google_auth
 
+# Payment
+from app.routes.payment import router as payment_router
+
+# Upload
+from app.routes.upload import router as upload_router
+
+# Pet & Hospital
+from app.routes.pet import router as pet_router
+from app.routes.hospital import router as hospital_router
+
+# RAG
+from app.routes import rag
+
 # Dog Routes
 from app.routes.pets_plans import (
     router as dog_plan_router
@@ -34,16 +47,15 @@ from app.models.cat_insurance_application import (
     CatInsuranceApplication
 )
 
-from app.routes.pet import router as pet_router
-from app.routes.hospital import router as hospital_router
+from app.models.payment import Payment
 
 from app.models.pet import Pet
 from app.models.hospital import Hospital
 # rag 
+print("MAIN STEP 4")
 
 from app.routes import rag
-from app.routes import ai_claim_review
-
+print("MAIN STEP 5")
 
 app = FastAPI(
     title="PetCare Insurance API"
@@ -52,35 +64,37 @@ app = FastAPI(
 # Create Database Tables
 Base.metadata.create_all(bind=engine)
 
+# ==========================
+# Register Routes
+# ==========================
+
 # Auth
 app.include_router(auth.router)
 app.include_router(google_auth.router)
 
+# Pet & Hospital
 app.include_router(pet_router)
 app.include_router(hospital_router)
 
 # Claims
 app.include_router(claims.router)
 
-# Dog
+# Payment
+app.include_router(payment_router)
+
+# Upload
+app.include_router(upload_router)
+
+# Dog Insurance
 app.include_router(dog_plan_router)
 app.include_router(dog_insurance_router)
 
-# Cat
+# Cat Insurance
 app.include_router(cat_plan_router)
 app.include_router(cat_insurance_router)
 
-
-# rag policy register 
-
+# RAG
 app.include_router(rag.router)
-
-#  ai claim service for admin (gives deatils of claim with reject/ aprroved with reason using rag)
-
-app.include_router(ai_claim_review.router)
-
-
-
 
 @app.get("/")
 def home():
