@@ -29,3 +29,21 @@ Question:
         ]
     )
     return response.choices[0].message.content
+
+
+
+    # for ai claim review 
+
+def generate_claim_review(prompt):
+
+    response = client.chat.completions.create(
+        model="deepseek/deepseek-chat-v3-0324",
+        messages=[
+            {
+                "role":"user",
+                "content":prompt
+            }
+        ]
+    )
+
+    return response.choices[0].message.content    
