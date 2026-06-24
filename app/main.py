@@ -55,7 +55,9 @@ from app.models.hospital import Hospital
 print("MAIN STEP 4")
 
 from app.routes import rag
-print("MAIN STEP 5")
+from app.routes import ai_claim_review
+
+
 
 app = FastAPI(
     title="PetCare Insurance API"
@@ -95,6 +97,13 @@ app.include_router(cat_insurance_router)
 
 # RAG
 app.include_router(rag.router)
+
+#  ai claim service for admin (gives deatils of claim with reject/ aprroved with reason using rag)
+
+app.include_router(ai_claim_review.router)
+
+
+
 
 @app.get("/")
 def home():
