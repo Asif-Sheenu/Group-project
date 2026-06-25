@@ -1,8 +1,9 @@
 from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
 
 from app.core.database import Base, engine, supabase
-# Auth
 
+# Auth
 from app.routes import auth
 from app.routes import claims
 from app.routes import google_auth
@@ -51,16 +52,25 @@ from app.models.payment import Payment
 
 from app.models.pet import Pet
 from app.models.hospital import Hospital
-# rag 
+
 print("MAIN STEP 4")
 
-from app.routes import rag
 from app.routes import ai_claim_review
-
 
 
 app = FastAPI(
     title="PetCare Insurance API"
+)
+
+# ==========================
+# CORS Middleware
+# ==========================
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],      # Change to your frontend URL in production
+    allow_credentials=False,  # Keep False when using "*"
+    allow_methods=["*"],
+    allow_headers=["*"],
 )
 
 # Create Database Tables
@@ -98,11 +108,8 @@ app.include_router(cat_insurance_router)
 # RAG
 app.include_router(rag.router)
 
-#  ai claim service for admin (gives deatils of claim with reject/ aprroved with reason using rag)
-
+# AI Claim Review
 app.include_router(ai_claim_review.router)
-
-
 
 
 @app.get("/")
