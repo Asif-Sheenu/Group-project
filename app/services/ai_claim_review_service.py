@@ -1,8 +1,9 @@
 from sqlalchemy.orm import Session
 
 from app.models.claim import Claim
-from app.services.rag_service import search_policy_documents
-from app.services.llm_service import generate_claim_review
+# from app.services.rag_service import search_policy_documents
+# from app.services.llm_service import generate_claim_review
+from app.services.agents.policy_graph import claim_graph
 
 
 def review_claim(
@@ -21,42 +22,70 @@ def review_claim(
             "error": "Claim not found"
         }
 
-    results = search_policy_documents(
-        claim.description
-    )
+#     results = search_policy_documents(
+#         claim.description
+#     )
 
-    context = "\n".join(
-        results["documents"][0]
-    )
+#     context = "\n".join(
+#         results["documents"][0]
+#     )
 
-    prompt = f"""
-You are an insurance claim reviewer.
+#     prompt = f"""
+# You are an insurance claim reviewer.
 
-Claim Description:
-{claim.description}
+# Claim Description:
+# {claim.description}
 
-Claim Amount:
-₹{claim.amount}
+# Claim Amount:
+# ₹{claim.amount}
 
-Policy Context:
-{context}
+# Policy Context:
+# {context}
 
-Analyze the claim and return ONLY in this format:
+# Analyze the claim and return ONLY in this format:
 
-RECOMMENDATION: APPROVE / REJECT / REVIEW
+# RECOMMENDATION: APPROVE / REJECT / REVIEW
 
-REASON:
-<short reason>
+# REASON:
+# <short reason>
 
-POLICY_SECTION:
-<policy section used>
-"""
+# POLICY_SECTION:
+# <policy section used>
+# """
 
-    review = generate_claim_review(
-        prompt
-    )
+#     review = generate_claim_review(
+#         prompt
+#     )
 
+#     recommendation = "REVIEW"
+
+#     if "APPROVE" in review.upper():
+#         recommendation = "APPROVE"
+
+#     elif "REJECT" in review.upper():
+#         recommendation = "REJECT"
+
+#     claim.ai_recommendation = recommendation
+#     claim.ai_reason = review
+    
+# for langgrapg 
+
+    initial_state = {
+    "claim_description": claim.description,
+    "claim_amount": claim.amount,
+    "policy_context": "",
+    "review": "",
+    "recommendation": ""
+
+}
+
+    results= claim_graph.invoke(initial_state)
+
+    review= results["review"]
+
+    # Extract Recommendation
     recommendation = "REVIEW"
+
 
     if "APPROVE" in review.upper():
         recommendation = "APPROVE"
@@ -67,6 +96,7 @@ POLICY_SECTION:
     claim.ai_recommendation = recommendation
     claim.ai_reason = review
 
+        
     db.commit()
     db.refresh(claim)
     
