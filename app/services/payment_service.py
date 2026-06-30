@@ -19,7 +19,17 @@ client = razorpay.Client(
 )
 
 
+# ==========================
+# Create Razorpay Order
+# ==========================
+
 def create_order(db, request):
+
+    print("\n========== CREATE ORDER ==========")
+    print("User ID:", request.user_id)
+    print("Application ID:", request.application_id)
+    print("Application Type:", request.application_type)
+    print("Received Amount:", request.amount)
 
     if request.application_type == "dog":
 
@@ -44,22 +54,33 @@ def create_order(db, request):
         )
 
     else:
+
         raise HTTPException(
             status_code=400,
             detail="Invalid application type"
         )
 
     if not application:
+
         raise HTTPException(
             status_code=404,
             detail="Application not found"
         )
+
+    print("Application Found ✓")
+
+    print(
+        "Amount sent to Razorpay (Paise):",
+        int(request.amount * 100)
+    )
 
     order = client.order.create({
         "amount": int(request.amount * 100),
         "currency": "INR",
         "payment_capture": 1
     })
+
+    print("Razorpay Order Created:", order["id"])
 
     payment = Payment(
         user_id=request.user_id,
@@ -74,10 +95,19 @@ def create_order(db, request):
     db.commit()
     db.refresh(payment)
 
+    print("Payment Saved Successfully")
+    print("===============================\n")
+
     return order
 
 
+# ==========================
+# Verify Payment
+# ==========================
+
 def verify_payment(db, request):
+
+    print("\n========== VERIFY PAYMENT ==========")
 
     client.utility.verify_payment_signature({
         "razorpay_order_id": request.razorpay_order_id,
@@ -95,13 +125,16 @@ def verify_payment(db, request):
     )
 
     if not payment:
+
         raise HTTPException(
             status_code=404,
             detail="Payment not found"
         )
 
-    # Duplicate protection
+    # Prevent duplicate verification
     if payment.payment_status == "success":
+
+        print("Payment already verified.")
         return payment
 
     payment.razorpay_payment_id = (
@@ -114,6 +147,8 @@ def verify_payment(db, request):
         "PCI-" +
         uuid.uuid4().hex[:8].upper()
     )
+
+    print("Generated Policy Number:", payment.policy_number)
 
     # Activate Insurance
 
@@ -141,13 +176,38 @@ def verify_payment(db, request):
 
     if application:
 
-        # Adjust names to match your model
         application.status = "active"
 
-        # Optional if field exists
-        # application.payment_status = "paid"
+        print("Insurance Activated")
 
     db.commit()
     db.refresh(payment)
 
+    print("Payment Verification Successful")
+    print("=================================\n")
+
     return payment
+
+
+# ==========================
+# Get User Policy Numbers
+# ==========================
+
+def get_user_policy_numbers(db, user_id):
+
+    payments = (
+        db.query(Payment)
+        .filter(
+            Payment.user_id == user_id,
+            Payment.payment_status == "success"
+        )
+        .all()
+    )
+
+    return [
+        {
+            "policy_number": payment.policy_number,
+            "application_type": payment.application_type
+        }
+        for payment in payments
+    ]

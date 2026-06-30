@@ -10,7 +10,8 @@ from app.schemas.payment import (
 
 from app.services.payment_service import (
     create_order,
-    verify_payment
+    verify_payment,
+    get_user_policy_numbers
 )
 
 from app.models.payment import Payment
@@ -51,6 +52,21 @@ def verify_payment_api(
 
 
 # ==========================
+# Get User Policy Numbers
+# ==========================
+
+@router.get("/user/{user_id}/policy")
+def get_user_policy(
+    user_id: int,
+    db: Session = Depends(get_db)
+):
+    return get_user_policy_numbers(
+        db,
+        user_id
+    )
+
+
+# ==========================
 # Get Policy Details
 # ==========================
 
@@ -78,6 +94,7 @@ def get_policy(
         "policy_number": payment.policy_number,
         "user_id": payment.user_id,
         "application_id": payment.application_id,
+        "application_type": payment.application_type,
         "amount": payment.amount,
         "payment_status": payment.payment_status,
         "created_at": payment.created_at
