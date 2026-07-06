@@ -17,15 +17,9 @@ class Claim(Base):
 
     status = Column(String, default="PENDING")
 
-    ai_recommendation = Column(
-    String,
-    nullable=True
-    )
+    ai_recommendation = Column(String,nullable=True)
 
-    ai_reason = Column(
-        Text,
-    nullable=True
-    )
+    ai_reason = Column(Text,nullable=True)
 
     image_url = Column(String, nullable=True)
 
