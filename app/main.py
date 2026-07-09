@@ -83,6 +83,12 @@ from app.routes.cat_insurance_application import (
 from app.routes import ai_claim_review
 
 # ==========================
+# Admin Route
+# ==========================
+
+from app.routes import admin
+
+# ==========================
 # Import Models
 # ==========================
 
@@ -113,7 +119,7 @@ app = FastAPI(
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],      # Change this in production
+    allow_origins=["*"],
     allow_credentials=False,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -172,6 +178,13 @@ app.include_router(rag.router)
 # AI Claim Review
 app.include_router(ai_claim_review.router)
 
+# Admin
+app.include_router(
+    admin.router,
+    prefix="/admin",
+    tags=["Admin"]
+)
+
 
 @app.get("/")
 def home():
@@ -191,4 +204,3 @@ def test():
     )
 
     return data.data
-    
