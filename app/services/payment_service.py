@@ -9,6 +9,8 @@ from razorpay.errors import SignatureVerificationError
 from app.models.payment import Payment
 from app.models.insurance_application import InsuranceApplication
 from app.models.cat_insurance_application import CatInsuranceApplication
+from app.models.pet_plans import DogPlan
+from app.models.cat_plans import CatPlan
 
 load_dotenv()
 
@@ -167,3 +169,83 @@ def get_user_policy_numbers(db, user_id):
         {"policy_number": p.policy_number, "application_type": p.application_type}
         for p in payments
     ]
+
+
+
+
+
+
+def get_payment_detail_by_policy(db, policy_number):
+
+    payment = (
+        db.query(Payment)
+        .filter(
+            Payment.policy_number == policy_number,
+            Payment.payment_status == "success"
+        )
+        .first()
+    )
+
+    if not payment:
+        raise HTTPException(
+            status_code=404,
+            detail="Policy not found"
+        )
+
+    if payment.application_type == "dog":
+
+        application = (
+            db.query(InsuranceApplication)
+            .filter(InsuranceApplication.id == payment.application_id)
+            .first()
+        )
+
+        if not application:
+            raise HTTPException(status_code=404, detail="Application not found")
+
+        plan = (
+            db.query(DogPlan)
+            .filter(DogPlan.name == application.plan_name)
+            .first()
+        )
+
+        if not plan:
+            raise HTTPException(status_code=404, detail="Plan not found")
+
+        pet_type = "Dog"
+        pet_name = application.dog_name
+
+    else:
+
+        application = (
+            db.query(CatInsuranceApplication)
+            .filter(CatInsuranceApplication.id == payment.application_id)
+            .first()
+        )
+
+        if not application:
+            raise HTTPException(status_code=404, detail="Application not found")
+
+        plan = (
+            db.query(CatPlan)
+            .filter(CatPlan.name == application.plan_name)
+            .first()
+        )
+
+        if not plan:
+            raise HTTPException(status_code=404, detail="Plan not found")
+
+        pet_type = "Cat"
+        pet_name = application.cat_name
+
+    return {
+        "pet_type": pet_type,
+        "pet_name": pet_name,
+        "plan_name": plan.name,
+        "premium_amount": plan.premium_amount,
+        "policy_number": payment.policy_number,
+        "payment_method": "Razorpay",
+        "razorpay_payment_id": payment.razorpay_payment_id,
+        "payment_status": payment.payment_status,
+        "purchase_date": payment.created_at
+    }

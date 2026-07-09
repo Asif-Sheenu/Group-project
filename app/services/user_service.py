@@ -16,3 +16,19 @@ def create_user(user_data: dict):
         .execute()
     
     return response.data
+
+
+def helper_func(user_id):
+
+    response = (
+        supabase
+        .table("users")
+        .select("*")
+        .eq("id", user_id)
+        .execute()
+    )
+
+    if response.data:
+        return response.data[0]
+
+    return None
