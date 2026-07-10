@@ -11,11 +11,15 @@ from app.routes import auth
 from app.routes import claims
 from app.routes import google_auth
 
+from app.routes.logout import router as logout_router
+
 # ==========================
 # Payment
 # ==========================
 
 from app.routes.payment import router as payment_router
+
+from app.routes.wallet import router as wallet_router
 
 # ==========================
 # Admin Payment
@@ -139,6 +143,8 @@ Base.metadata.create_all(bind=engine)
 app.include_router(auth.router)
 app.include_router(google_auth.router)
 
+app.include_router(logout_router)
+
 # Pet
 app.include_router(pet_router)
 
@@ -153,6 +159,8 @@ app.include_router(claims.router)
 
 # Payment
 app.include_router(payment_router)
+
+app.include_router(wallet_router)
 
 # Admin Payments
 app.include_router(admin_payment_router)
